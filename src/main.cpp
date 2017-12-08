@@ -1,4 +1,3 @@
-#include <uWS/uWS.h>
 #include <iostream>
 #include "json.hpp"
 #include <math.h>
@@ -27,7 +26,6 @@ std::string hasData(std::string s) {
 
 int main()
 {
-  uWS::Hub h;
 
   //Set up parameters here
   double delta_t = 0.1; // Time elapsed between measurements [sec]
@@ -38,14 +36,16 @@ int main()
 
   // Read map data
   Map map;
-  if (!read_map_data("../data/map_data.txt", map)) {
+  if (!read_map_data("map_data.txt", map)) {
 	  cout << "Error: Could not open map file" << endl;
 	  return -1;
   }
 
   // Create particle filter
   ParticleFilter pf;
+  cout << "\n\n	start====!!!!!!!!!!!!!!!!!!!!!!!\n\n";
 
+#if 0
   h.onMessage([&pf,&map,&delta_t,&sensor_range,&sigma_pos,&sigma_landmark](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -188,91 +188,5 @@ int main()
     return -1;
   }
   h.run();
+#endif
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
