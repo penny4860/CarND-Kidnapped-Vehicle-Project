@@ -123,6 +123,28 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation 
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
+
+	cout << "sensor_range = "<< sensor_range << "\n";
+	cout << "std_landmark = "<< std_landmark[0] << ", "<< std_landmark[1] << "\n";
+
+	cout << "observations\n";
+	for (int i = 0; i < observations.size(); i++)
+	{
+		double x = observations[i].x;
+		double y = observations[i].y;
+		int id = observations[i].id;
+		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
+	}
+
+	cout << "map\n";
+	for (int i = 0; i < map_landmarks.landmark_list.size(); i++)
+	{
+		float x = map_landmarks.landmark_list[i].x_f;
+		float y = map_landmarks.landmark_list[i].y_f;
+		int id = map_landmarks.landmark_list[i].id_i;
+		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
+	}
+
 }
 
 void ParticleFilter::resample() {
