@@ -145,6 +145,22 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
 	}
 
+	// 1. particle coordinate to map coordinate
+	for (int i = 0; i < num_particles; i++)
+	{
+		double xp = particles[i].x;
+		double yp = particles[i].y;
+		double theta_p = particles[i].theta;
+
+		for (int i = 0; i < observations.size(); i++)
+		{
+			double xc = observations[i].x;
+			double yc = observations[i].y;
+
+			double xm = xp + cos(theta_p)*xc - sin(theta_p)*yc;
+			double ym = yp + sin(theta_p)*xc + cos(theta_p)*yc;
+		}
+	}
 }
 
 void ParticleFilter::resample() {
