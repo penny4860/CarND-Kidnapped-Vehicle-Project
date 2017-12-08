@@ -45,7 +45,24 @@ int main()
 
   // Create particle filter
   ParticleFilter pf;
+  if (!pf.initialized()) {
 
+  	// Sense noisy position data from the simulator
+	double sense_x = 5.0;
+	double sense_y = 10.0;
+	double sense_theta = 1.1;
+
+	pf.init(sense_x, sense_y, sense_theta, sigma_pos);
+  }
+  else {
+	// Predict the vehicle's next state from previous (noiseless control) data.
+  	double previous_velocity = 0.5;
+	double previous_yawrate = 0.1;
+
+	pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
+  }
+
+#if 0
   h.onMessage([&pf,&map,&delta_t,&sensor_range,&sigma_pos,&sigma_landmark](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -188,6 +205,7 @@ int main()
     return -1;
   }
   h.run();
+#endif
 }
 
 
