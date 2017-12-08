@@ -227,6 +227,33 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		dataAssociation(pred_landmarks, meas_landmarks);
 
 		// 3. update weights
+		particles[i].weight = 1.0;
+
+		double std_x = std_landmark[0];
+		double std_y = std_landmark[1];
+		double na = 2.0 * std_x * std_x;
+		double nb = 2.0 * std_y * std_y;
+		double gauss_norm = 2.0 * M_PI * std_x * std_y;
+
+		for (unsigned j=0; j < observations.size(); j++){
+			double o_x = observations[j].x;
+			double o_y = observations[j].y;
+
+			double pr_x, pr_y;
+			for (unsigned int k = 0; k < pred_landmarks.size(); k++) {
+        		if (pred_landmarks[k].id == observations[j].id) {
+          			pr_x = pred_landmarks[k].x;
+          			pr_y = pred_landmarks[k].y;
+          			break;
+        		}
+      		}
+      		double obs_w = 1/gauss_norm * exp( - (pow(pr_x-o_x,2)/na + (pow(pr_y-o_y,2)/nb)) );
+
+      		// product of this obersvation weight with total observations weight
+      		particles[i].weight *= obs_w;
+		}
+
+		weights[i] = particles[i].weight;
 
 	}
 }
