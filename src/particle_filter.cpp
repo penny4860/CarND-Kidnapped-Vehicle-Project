@@ -104,27 +104,28 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
 		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
-	// TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
-	//   more about this distribution here: https://en.wikipedia.org/wiki/Multivariate_normal_distribution
-	// NOTE: The observations are given in the VEHICLE'S coordinate system. Your particles are located
-	//   according to the MAP'S coordinate system. You will need to transform between the two systems.
-	//   Keep in mind that this transformation requires both rotation AND translation (but no scaling).
-	//   The following is a good resource for the theory:
-	//   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm
-	//   and the following is a good resource for the actual equation to implement (look at equation 
-	//   3.33
-	//   http://planning.cs.uiuc.edu/node99.html
+	/* Calculate likelihood and update weights
+
+		# Args
+			sensor_range :
+			std_landmark :
+				Sensor (e.g. lidar) measurement uncertainty.
+			observations :
+				Sensor measurements in vehicle coordinate system.
+				This information is used as "measurements" in the Baysian rule.
+			map_landmarks :
+				predefined landmark position in map coordinate system
+				This information is used as "prior" in the Baysian rule.
+	 */
+
+	// 1. Get predicted landmarks
 	std::vector<LandmarkObs> pred_landmarks;
 	for (unsigned int i = 0; i < map_landmarks.landmark_list.size(); i++)
 	{
-		float x = map_landmarks.landmark_list[i].x_f;
-		float y = map_landmarks.landmark_list[i].y_f;
-		int id = map_landmarks.landmark_list[i].id_i;
-
 		LandmarkObs obs;
-		obs.x = x;
-		obs.y = y;
-		obs.id = id;
+		obs.x = map_landmarks.landmark_list[i].x_f;
+		obs.y = map_landmarks.landmark_list[i].y_f;
+		obs.id = map_landmarks.landmark_list[i].id_i;
 		pred_landmarks.push_back(obs);
 	}
 
