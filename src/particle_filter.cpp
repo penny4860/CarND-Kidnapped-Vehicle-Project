@@ -137,13 +137,19 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	}
 
 	cout << "map\n";
-	std::vector<LandmarkObs> landmarks;
+	std::vector<LandmarkObs> pred_landmarks;
 	for (int i = 0; i < map_landmarks.landmark_list.size(); i++)
 	{
 		float x = map_landmarks.landmark_list[i].x_f;
 		float y = map_landmarks.landmark_list[i].y_f;
 		int id = map_landmarks.landmark_list[i].id_i;
 		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
+
+		LandmarkObs obs;
+		obs.x = x;
+		obs.y = y;
+		obs.id = id;
+		pred_landmarks.push_back(obs);
 	}
 
 	// 1. particle coordinate to map coordinate
