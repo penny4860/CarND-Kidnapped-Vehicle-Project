@@ -33,6 +33,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// Set the number of particles
 	num_particles = 1000;
 	particles.resize(num_particles);
+	weights.resize(num_particles);
 
 	// Initialize all particles to first position
 	// This line creates a normal (Gaussian) distribution for x, y, theta.
@@ -210,10 +211,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		std::vector<LandmarkObs> meas_landmarks;
 
 		// 1. particle coordinate to map coordinate
-		for (unsigned int i = 0; i < observations.size(); i++)
+		for (unsigned int j = 0; j < observations.size(); j++)
 		{
-			double xc = observations[i].x;
-			double yc = observations[i].y;
+			double xc = observations[j].x;
+			double yc = observations[j].y;
 
 			double xm = xp + cos(theta_p)*xc - sin(theta_p)*yc;
 			double ym = yp + sin(theta_p)*xc + cos(theta_p)*yc;
