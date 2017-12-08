@@ -48,7 +48,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 		particles[i].weight = 1.0;
 	}
 	is_initialized = true;
-#if 0
+#if 1
 	cout << "\n\n";
 	for (int i = 0; i < 1000; i++)
 	{
