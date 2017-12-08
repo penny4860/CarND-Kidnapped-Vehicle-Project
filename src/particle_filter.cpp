@@ -31,7 +31,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	 * 		std[] : GPS measurement uncertatinty
 	 */
 	// Set the number of particles
-	num_particles = 1000;
+	num_particles = 50;
 	particles.resize(num_particles);
 	weights.resize(num_particles);
 
