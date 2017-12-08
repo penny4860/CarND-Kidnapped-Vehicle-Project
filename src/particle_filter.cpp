@@ -187,7 +187,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 #endif
 	cout << "map\n";
 	std::vector<LandmarkObs> pred_landmarks;
-	for (int i = 0; i < map_landmarks.landmark_list.size(); i++)
+	for (unsigned int i = 0; i < map_landmarks.landmark_list.size(); i++)
 	{
 		float x = map_landmarks.landmark_list[i].x_f;
 		float y = map_landmarks.landmark_list[i].y_f;
@@ -210,7 +210,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		std::vector<LandmarkObs> meas_landmarks;
 
 		// 1. particle coordinate to map coordinate
-		for (int i = 0; i < observations.size(); i++)
+		for (unsigned int i = 0; i < observations.size(); i++)
 		{
 			double xc = observations[i].x;
 			double yc = observations[i].y;
@@ -225,6 +225,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		}
 		// 2. matching nearest landmarks
 		dataAssociation(pred_landmarks, meas_landmarks);
+
+		// 3. update weights
+
 	}
 }
 
