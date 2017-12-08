@@ -158,6 +158,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		double xp = particles[i].x;
 		double yp = particles[i].y;
 		double theta_p = particles[i].theta;
+		std::vector<LandmarkObs> meas_landmarks;
 
 		for (int i = 0; i < observations.size(); i++)
 		{
@@ -166,7 +167,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 			double xm = xp + cos(theta_p)*xc - sin(theta_p)*yc;
 			double ym = yp + sin(theta_p)*xc + cos(theta_p)*yc;
+
+			LandmarkObs obs;
+			obs.x = xm;
+			obs.y = ym;
+			meas_landmarks.push_back(obs);
 		}
+		dataAssociation(pred_landmarks, meas_landmarks);
 	}
 }
 
