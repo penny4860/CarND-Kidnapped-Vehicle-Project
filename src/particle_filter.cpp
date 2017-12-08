@@ -20,8 +20,7 @@
 using namespace std;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
-	/*
-		Initialize the particle using the gps input & its uncertainty.
+	/*  Initialize the particle using the gps input & its uncertainty.
 
 		# Args
 			x, y, theta : GPS measurement
@@ -44,35 +43,35 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
-	// 1. Add control vector(velocity & yaw_rate) to each particles
-	for (int i = 0; i < num_particles; i++) {
+	/*  Predict particles state using control vector (v, yaw_rate)
 
-		// cout << "\n	x = " << particles[i].x << ", y = " << particles[i].y << ", theta = " << particles[i].theta;
+		# Args
+			delta_t : time
+			std_pos : GPS measurement uncertainty
+			velocity : control vector 1
+			yaw_rate : control vector 2
+	 */
+	// 1. Process next state according to CTRV-model
+	for (int i = 0; i < num_particles; i++) {
+		// in case of yaw_rate == 0
 		if (fabs(yaw_rate) < 0.001) {
-			particles[i].x = particles[i].x + velocity * cos(particles[i].theta) * delta_t;
-			particles[i].y = particles[i].y + velocity * sin(particles[i].theta) * delta_t;
-		} else {
-			particles[i].x = particles[i].x +
-		        velocity / yaw_rate * (sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta));
-			particles[i].y = particles[i].y +
-		        velocity / yaw_rate * (-cos(particles[i].theta + yaw_rate * delta_t) + cos(particles[i].theta));
+			particles[i].x += velocity * cos(particles[i].theta) * delta_t;
+			particles[i].y += velocity * sin(particles[i].theta) * delta_t;
+		}
+		// in case of yaw_rate != 0
+		else {
+			particles[i].x += velocity / yaw_rate * (sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta));
+			particles[i].y += velocity / yaw_rate * (-cos(particles[i].theta + yaw_rate * delta_t) + cos(particles[i].theta));
 		}
 		particles[i].theta = particles[i].theta + yaw_rate * delta_t;
 	}
-	// 2. Add random gaussian noise
-	normal_distribution<double> dist_noise_x(0, std_pos[0]);
-	normal_distribution<double> dist_noise_y(0, std_pos[1]);
-	normal_distribution<double> dist_noise_theta(0, std_pos[2]);
+	// 2. Add gaussian noise
+	normal_distribution<double> dist_x(0, std_pos[0]), dist_y(0, std_pos[1]), dist_theta(0, std_pos[2]);
 	default_random_engine gen;
-
 	for (int i = 0; i < num_particles; i++) {
-		double noise_x = dist_noise_x(gen);
-		double noise_y = dist_noise_y(gen);
-		double noise_theta = dist_noise_theta(gen);
-
-		particles[i].x += noise_x;
-		particles[i].y += noise_y;
-		particles[i].theta += noise_theta;
+		particles[i].x += dist_x(gen);
+		particles[i].y += dist_y(gen);
+		particles[i].theta += dist_theta(gen);
 	}
 }
 
