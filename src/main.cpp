@@ -43,7 +43,7 @@ int main()
   // Create particle filter
   ParticleFilter pf;
 
-  for (int i=0; i < 2; i++)
+  for (int i=0; i < 1; i++)
   {
 	  if (!pf.initialized()) {
 
@@ -75,6 +75,7 @@ int main()
 				LandmarkObs obs;
 				obs.x = xs[i];
 				obs.y = ys[i];
+				obs.id = 0;
 				noisy_observations.push_back(obs);
 		  }
 	  }
