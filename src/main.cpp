@@ -65,6 +65,23 @@ int main()
 
 		cout << "\n predict i=" << i;
 	  }
+
+	  vector<LandmarkObs> noisy_observations;
+	  {
+		  double xs[] = {2.4908, 11.2329, -19.7299, 1.7643, 13.3229, 29.6736, -13.5466, 29.9759, -36.5593, 22.4577, -46.3593};
+		  double ys[] = {5.3393, -6.651, -2.3684, -23.5442, -22.597, 12.5129, -36.4848, -30.7101, -25.2046, -41.5287, -14.7814};
+		  for (int i = 0 ; i < 10; i++)
+		  {
+				LandmarkObs obs;
+				obs.x = xs[i];
+				obs.y = ys[i];
+				noisy_observations.push_back(obs);
+		  }
+	  }
+	  // Update the weights and resample
+	  pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
+	  // pf.resample();
+
   }
 
 #if 0
