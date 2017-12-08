@@ -1,4 +1,3 @@
-#include <uWS/uWS.h>
 #include <iostream>
 #include "json.hpp"
 #include <math.h>
@@ -27,8 +26,6 @@ std::string hasData(std::string s) {
 
 int main()
 {
-  uWS::Hub h;
-
   //Set up parameters here
   double delta_t = 0.1; // Time elapsed between measurements [sec]
   double sensor_range = 50; // Sensor range [m]
@@ -38,7 +35,7 @@ int main()
 
   // Read map data
   Map map;
-  if (!read_map_data("../data/map_data.txt", map)) {
+  if (!read_map_data("map_data.txt", map)) {
 	  cout << "Error: Could not open map file" << endl;
 	  return -1;
   }
