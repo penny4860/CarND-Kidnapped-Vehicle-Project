@@ -109,6 +109,56 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
 	//   implement this method and use it as a helper during the updateWeights phase.
 
+	/*
+	 * # Args
+	 * 		predicted : landmarks
+	 * 		observations : sensor input
+	 *
+	 * # Assign observations id property
+	 */
+#if 0
+	cout << "\n	predicted " << predicted.size();
+	for (int i = 0; i < predicted.size(); i++)
+	{
+		cout << predicted[i].id << "\n";
+	}
+
+	cout << "\n observations " << observations.size();
+	for (int i = 0; i < observations.size(); i++)
+	{
+		cout << observations[i].id << "\n";
+	}
+#endif
+
+	for (unsigned int i = 0; i < observations.size(); i++)
+	{
+		double min_dist = 50000;
+		int min_index = -1;
+		for (unsigned int j = 0; j < predicted.size(); j++)
+		{
+			double dist = sqrt(pow(observations[i].x - predicted[j].x, 2) + pow(observations[i].y - predicted[j].y, 2));
+			// cout << "\n	i= " << i << " j= " << j << " dist= " << dist << " min dist= " << min_dist;
+			if (min_dist > dist)
+			{
+				min_dist = dist;
+				min_index = j;
+			}
+		}
+		observations[i].id = predicted[min_index].id;
+	}
+#if 0
+	cout << "\n	predicted result \n" << predicted.size();
+	for (int i = 0; i < predicted.size(); i++)
+	{
+		cout << "	" << predicted[i].x << ", " << predicted[i].y << ", " << predicted[i].id << "\n";
+	}
+
+	cout << "\n observations result \n" << observations.size();
+	for (int i = 0; i < observations.size(); i++)
+	{
+		cout << "	" << observations[i].x << ", " << observations[i].y << ", " << observations[i].id << "\n";
+	}
+#endif
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
@@ -123,10 +173,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation 
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
-
+#if 0
 	cout << "sensor_range = "<< sensor_range << "\n";
 	cout << "std_landmark = "<< std_landmark[0] << ", "<< std_landmark[1] << "\n";
-
 	cout << "observations\n";
 	for (int i = 0; i < observations.size(); i++)
 	{
@@ -135,7 +184,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		int id = observations[i].id;
 		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
 	}
-
+#endif
 	cout << "map\n";
 	std::vector<LandmarkObs> pred_landmarks;
 	for (int i = 0; i < map_landmarks.landmark_list.size(); i++)
@@ -143,8 +192,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		float x = map_landmarks.landmark_list[i].x_f;
 		float y = map_landmarks.landmark_list[i].y_f;
 		int id = map_landmarks.landmark_list[i].id_i;
+#if 0
 		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
-
+#endif
 		LandmarkObs obs;
 		obs.x = x;
 		obs.y = y;
@@ -152,7 +202,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		pred_landmarks.push_back(obs);
 	}
 
-	// 1. particle coordinate to map coordinate
 	for (int i = 0; i < num_particles; i++)
 	{
 		double xp = particles[i].x;
@@ -160,6 +209,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		double theta_p = particles[i].theta;
 		std::vector<LandmarkObs> meas_landmarks;
 
+		// 1. particle coordinate to map coordinate
 		for (int i = 0; i < observations.size(); i++)
 		{
 			double xc = observations[i].x;
@@ -173,6 +223,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			obs.y = ym;
 			meas_landmarks.push_back(obs);
 		}
+		// 2. matching nearest landmarks
 		dataAssociation(pred_landmarks, meas_landmarks);
 	}
 }
