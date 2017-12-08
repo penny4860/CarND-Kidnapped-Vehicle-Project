@@ -42,29 +42,21 @@ int main()
 
   // Create particle filter
   ParticleFilter pf;
+  if (!pf.initialized()) {
 
-  for (int i=0; i < 10; i++)
-  {
-	  if (!pf.initialized()) {
+  	// Sense noisy position data from the simulator
+	double sense_x = 5.0;
+	double sense_y = 10.0;
+	double sense_theta = 1.1;
 
-	  	// Sense noisy position data from the simulator
-		double sense_x = 5.0;
-		double sense_y = 10.0;
-		double sense_theta = 1.1;
+	pf.init(sense_x, sense_y, sense_theta, sigma_pos);
+  }
+  else {
+	// Predict the vehicle's next state from previous (noiseless control) data.
+  	double previous_velocity = 0.5;
+	double previous_yawrate = 0.1;
 
-		pf.init(sense_x, sense_y, sense_theta, sigma_pos);
-
-		cout << "\n init i=" << i;
-	  }
-	  else {
-		// Predict the vehicle's next state from previous (noiseless control) data.
-	  	double previous_velocity = 0.5;
-		double previous_yawrate = 0.1;
-
-		pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
-
-		cout << "\n predict i=" << i;
-	  }
+	pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
   }
 
 #if 0
