@@ -31,7 +31,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	 * 		std[] : GPS measurement uncertatinty
 	 */
 	// Set the number of particles
-	num_particles = 1000;
+	num_particles = 50;
 	particles.resize(num_particles);
 	weights.resize(num_particles);
 
@@ -222,6 +222,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			LandmarkObs obs;
 			obs.x = xm;
 			obs.y = ym;
+			obs.id = observations[j].id; //??
 			meas_landmarks.push_back(obs);
 		}
 		// 2. matching nearest landmarks
@@ -237,12 +238,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		double gauss_norm = 2.0 * M_PI * std_x * std_y;
 
 		for (unsigned j=0; j < observations.size(); j++){
-			double o_x = observations[j].x;
-			double o_y = observations[j].y;
+			double o_x = meas_landmarks[j].x;
+			double o_y = meas_landmarks[j].y;
 
 			double pr_x, pr_y;
 			for (unsigned int k = 0; k < pred_landmarks.size(); k++) {
-        		if (pred_landmarks[k].id == observations[j].id) {
+        		if (pred_landmarks[k].id == meas_landmarks[j].id) {
           			pr_x = pred_landmarks[k].x;
           			pr_y = pred_landmarks[k].y;
           			break;
