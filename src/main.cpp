@@ -1,3 +1,4 @@
+#include <uWS/uWS.h>
 #include <iostream>
 #include "json.hpp"
 #include <math.h>
@@ -26,6 +27,8 @@ std::string hasData(std::string s) {
 
 int main()
 {
+  uWS::Hub h;
+
   //Set up parameters here
   double delta_t = 0.1; // Time elapsed between measurements [sec]
   double sensor_range = 50; // Sensor range [m]
@@ -35,7 +38,7 @@ int main()
 
   // Read map data
   Map map;
-  if (!read_map_data("map_data.txt", map)) {
+  if (!read_map_data("../data/map_data.txt", map)) {
 	  cout << "Error: Could not open map file" << endl;
 	  return -1;
   }
@@ -43,49 +46,6 @@ int main()
   // Create particle filter
   ParticleFilter pf;
 
-  for (int i=0; i < 1; i++)
-  {
-	  if (!pf.initialized()) {
-
-	  	// Sense noisy position data from the simulator
-		double sense_x = 5.0;
-		double sense_y = 10.0;
-		double sense_theta = 1.1;
-
-		pf.init(sense_x, sense_y, sense_theta, sigma_pos);
-
-		cout << "\n init i=" << i;
-	  }
-	  else {
-		// Predict the vehicle's next state from previous (noiseless control) data.
-	  	double previous_velocity = 0.5;
-		double previous_yawrate = 0.1;
-
-		pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
-
-		cout << "\n predict i=" << i;
-	  }
-
-	  vector<LandmarkObs> noisy_observations;
-	  {
-		  double xs[] = {2.4908, 11.2329, -19.7299, 1.7643, 13.3229, 29.6736, -13.5466, 29.9759, -36.5593, 22.4577, -46.3593};
-		  double ys[] = {5.3393, -6.651, -2.3684, -23.5442, -22.597, 12.5129, -36.4848, -30.7101, -25.2046, -41.5287, -14.7814};
-		  for (int i = 0 ; i < 10; i++)
-		  {
-				LandmarkObs obs;
-				obs.x = xs[i];
-				obs.y = ys[i];
-				obs.id = 0;
-				noisy_observations.push_back(obs);
-		  }
-	  }
-	  // Update the weights and resample
-	  pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
-	  // pf.resample();
-
-  }
-
-#if 0
   h.onMessage([&pf,&map,&delta_t,&sensor_range,&sigma_pos,&sigma_landmark](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -228,7 +188,6 @@ int main()
     return -1;
   }
   h.run();
-#endif
 }
 
 
