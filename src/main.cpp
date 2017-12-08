@@ -110,18 +110,6 @@ int main()
 				noisy_observations.push_back(obs);
         	}
 
-        	{
-        		cout << "	sensor_range= " << sensor_range;
-        		cout << "sigma_landmark= " << sigma_landmark[0] << ", "<< sigma_landmark[1];
-        		cout << "\n		noisy_observations\n";
-
-        		for (int ii=0; ii < noisy_observations.size(); ii++)
-        		{
-        			cout << "i: " << ii << ", " << noisy_observations[ii].id << ", "<< noisy_observations[ii].x << ", " << noisy_observations[ii].y;
-        			cout << "\n";
-        		}
-        	}
-
 		  // Update the weights and resample
 		  pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
 		  pf.resample();
