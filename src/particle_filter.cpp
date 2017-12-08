@@ -137,6 +137,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	}
 
 	cout << "map\n";
+	std::vector<LandmarkObs> landmarks;
 	for (int i = 0; i < map_landmarks.landmark_list.size(); i++)
 	{
 		float x = map_landmarks.landmark_list[i].x_f;
