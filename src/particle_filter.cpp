@@ -174,18 +174,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   and the following is a good resource for the actual equation to implement (look at equation 
 	//   3.33
 	//   http://planning.cs.uiuc.edu/node99.html
-#if 0
-	cout << "sensor_range = "<< sensor_range << "\n";
-	cout << "std_landmark = "<< std_landmark[0] << ", "<< std_landmark[1] << "\n";
-	cout << "observations\n";
-	for (int i = 0; i < observations.size(); i++)
-	{
-		double x = observations[i].x;
-		double y = observations[i].y;
-		int id = observations[i].id;
-		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
-	}
-#endif
 	cout << "map\n";
 	std::vector<LandmarkObs> pred_landmarks;
 	for (unsigned int i = 0; i < map_landmarks.landmark_list.size(); i++)
@@ -193,9 +181,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		float x = map_landmarks.landmark_list[i].x_f;
 		float y = map_landmarks.landmark_list[i].y_f;
 		int id = map_landmarks.landmark_list[i].id_i;
-#if 0
-		cout << "		" << x << ", "<< y << ", "<< id <<"\n";
-#endif
+
 		LandmarkObs obs;
 		obs.x = x;
 		obs.y = y;
@@ -250,13 +236,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
         		}
       		}
       		double obs_w = 1/gauss_norm * exp( - (pow(pr_x-o_x,2)/na + (pow(pr_y-o_y,2)/nb)) );
-
-      		// product of this obersvation weight with total observations weight
       		particles[i].weight *= obs_w;
 		}
-
 		weights[i] = particles[i].weight;
-
 	}
 }
 
