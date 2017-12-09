@@ -183,20 +183,26 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 }
 
 void ParticleFilter::resample() {
-	default_random_engine gen;
-	vector<Particle> new_particles;
+	/* Resampling the particles according to the weight. */
 
-  	// get all of the current weights
+	default_random_engine gen;
+	vector<Particle> resampled_particles;
   	vector<double> weights;
+  	weights.resize(num_particles);
+  	resampled_particles.resize(num_particles);
+
+  	// 1. Get particles weights
   	for (int i = 0; i < num_particles; i++) {
-    	weights.push_back(particles[i].weight);
+    	weights[i] = particles[i].weight;
   	}
+
+  	// 2. Sample index of particle
   	discrete_distribution<int> index(weights.begin(), weights.end());
   	for (unsigned j=0; j<num_particles;j++){
-  		const int i = index(gen);
-  		new_particles.push_back(particles[i]);
+  		int i = index(gen);
+  		resampled_particles[i] = particles[i];
   	}
-  	particles = new_particles;
+  	particles = resampled_particles;
 }
 
 Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<int>& associations, 
