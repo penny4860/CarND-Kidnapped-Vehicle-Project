@@ -115,6 +115,41 @@ static void _get_pred_landmarks(std::vector<LandmarkObs> &pred_landmarks, const 
 	}
 }
 
+static void _to_map_coord(std::vector<LandmarkObs> &meas_landmarks,
+		const std::vector<LandmarkObs> &observations,
+		Particle particle)
+{
+	/* Transform the sensor input from particle coordinate to map coordinate.
+
+		# Args
+			meas_landmarks (output)
+				sensor input transformed to map coordinate
+
+			observations (intput)
+				sensor input in particle coordinate
+
+			particle
+				particle's (x, y, heading)
+	 */
+	double xp = particle.x;
+	double yp = particle.y;
+	double theta_p = particle.theta;
+	for (unsigned int j = 0; j < observations.size(); j++)
+	{
+		double xc = observations[j].x;
+		double yc = observations[j].y;
+
+		double xm = xp + cos(theta_p)*xc - sin(theta_p)*yc;
+		double ym = yp + sin(theta_p)*xc + cos(theta_p)*yc;
+
+		LandmarkObs obs;
+		obs.x = xm;
+		obs.y = ym;
+		obs.id = observations[j].id; //??
+		meas_landmarks[j] = obs;
+	}
+}
+
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
 		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
 	/* Calculate likelihood and update weights (particles[i].weight, weight)
@@ -131,32 +166,16 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 				This information is used as "prior" in the Baysian rule.
 	 */
 
-	// 1. Get predicted landmarks
+	// 0. Get predicted landmarks
 	std::vector<LandmarkObs> pred_landmarks(num_particles);
 	_get_pred_landmarks(pred_landmarks, map_landmarks);
 
 	for (int i = 0; i < num_particles; i++)
 	{
-		double xp = particles[i].x;
-		double yp = particles[i].y;
-		double theta_p = particles[i].theta;
-		std::vector<LandmarkObs> meas_landmarks;
-
 		// 1. particle coordinate to map coordinate
-		for (unsigned int j = 0; j < observations.size(); j++)
-		{
-			double xc = observations[j].x;
-			double yc = observations[j].y;
+		std::vector<LandmarkObs> meas_landmarks(observations.size());
+		_to_map_coord(meas_landmarks, observations, particles[i]);
 
-			double xm = xp + cos(theta_p)*xc - sin(theta_p)*yc;
-			double ym = yp + sin(theta_p)*xc + cos(theta_p)*yc;
-
-			LandmarkObs obs;
-			obs.x = xm;
-			obs.y = ym;
-			obs.id = observations[j].id; //??
-			meas_landmarks.push_back(obs);
-		}
 		// 2. matching nearest landmarks
 		dataAssociation(pred_landmarks, meas_landmarks);
 
