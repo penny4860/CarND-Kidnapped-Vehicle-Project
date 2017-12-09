@@ -19,6 +19,17 @@
 
 using namespace std;
 
+static void _get_pred_landmarks(std::vector<LandmarkObs> &pred_landmarks, const Map &map_landmarks);
+
+static void _to_map_coord(std::vector<LandmarkObs> &meas_landmarks,
+		const std::vector<LandmarkObs> &observations,
+		Particle particle);
+
+static double _calc_weight(const std::vector<LandmarkObs> &pred_landmarks,
+		const std::vector<LandmarkObs> &meas_landmarks,
+		double std_x,
+		double std_y);
+
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	/*  Initialize the particle using the gps input & its uncertainty.
 
@@ -100,82 +111,6 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 		else
 			cout << "\n warning : dataAssociation Error";
 	}
-}
-
-
-static void _get_pred_landmarks(std::vector<LandmarkObs> &pred_landmarks, const Map &map_landmarks)
-{
-	for (unsigned int i = 0; i < map_landmarks.landmark_list.size(); i++)
-	{
-		LandmarkObs obs;
-		obs.x = map_landmarks.landmark_list[i].x_f;
-		obs.y = map_landmarks.landmark_list[i].y_f;
-		obs.id = map_landmarks.landmark_list[i].id_i;
-		pred_landmarks[i] = obs;
-	}
-}
-
-static void _to_map_coord(std::vector<LandmarkObs> &meas_landmarks,
-		const std::vector<LandmarkObs> &observations,
-		Particle particle)
-{
-	/* Transform the sensor input from particle coordinate to map coordinate.
-
-		# Args
-			meas_landmarks (output)
-				sensor input transformed to map coordinate
-
-			observations (intput)
-				sensor input in particle coordinate
-
-			particle
-				particle's (x, y, heading)
-	 */
-	double xp = particle.x;
-	double yp = particle.y;
-	double theta_p = particle.theta;
-	for (unsigned int j = 0; j < observations.size(); j++)
-	{
-		double xc = observations[j].x;
-		double yc = observations[j].y;
-
-		double xm = xp + cos(theta_p)*xc - sin(theta_p)*yc;
-		double ym = yp + sin(theta_p)*xc + cos(theta_p)*yc;
-
-		LandmarkObs obs;
-		obs.x = xm;
-		obs.y = ym;
-		obs.id = observations[j].id; //??
-		meas_landmarks[j] = obs;
-	}
-}
-
-static double _calc_weight(const std::vector<LandmarkObs> &pred_landmarks,
-		const std::vector<LandmarkObs> &meas_landmarks,
-		double std_x,
-		double std_y)
-{
-	double weight = 1.0;
-	double na = 2.0 * std_x * std_x;
-	double nb = 2.0 * std_y * std_y;
-	double gauss_norm = 2.0 * M_PI * std_x * std_y;
-
-	for (unsigned j=0; j < meas_landmarks.size(); j++){
-		double o_x = meas_landmarks[j].x;
-		double o_y = meas_landmarks[j].y;
-
-		double pr_x, pr_y;
-		for (unsigned int k = 0; k < pred_landmarks.size(); k++) {
-    		if (pred_landmarks[k].id == meas_landmarks[j].id) {
-      			pr_x = pred_landmarks[k].x;
-      			pr_y = pred_landmarks[k].y;
-      			break;
-    		}
-  		}
-  		double obs_w = 1/gauss_norm * exp( - (pow(pr_x-o_x,2)/na + (pow(pr_y-o_y,2)/nb)) );
-  		weight *= obs_w;
-	}
-	return weight;
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
@@ -272,4 +207,88 @@ string ParticleFilter::getSenseY(Particle best)
     string s = ss.str();
     s = s.substr(0, s.length()-1);  // get rid of the trailing space
     return s;
+}
+
+
+static void _get_pred_landmarks(std::vector<LandmarkObs> &pred_landmarks, const Map &map_landmarks)
+{
+	/* Get pred_landmarks in LandmarkObs type */
+	for (unsigned int i = 0; i < map_landmarks.landmark_list.size(); i++)
+	{
+		LandmarkObs obs;
+		obs.x = map_landmarks.landmark_list[i].x_f;
+		obs.y = map_landmarks.landmark_list[i].y_f;
+		obs.id = map_landmarks.landmark_list[i].id_i;
+		pred_landmarks[i] = obs;
+	}
+}
+
+static void _to_map_coord(std::vector<LandmarkObs> &meas_landmarks,
+		const std::vector<LandmarkObs> &observations,
+		Particle particle)
+{
+	/* Transform the sensor input from particle coordinate to map coordinate.
+
+		# Args
+			meas_landmarks (output)
+				sensor input transformed to map coordinate
+
+			observations (intput)
+				sensor input in particle coordinate
+
+			particle
+				particle's (x, y, heading)
+	 */
+	double xp = particle.x;
+	double yp = particle.y;
+	double theta_p = particle.theta;
+	for (unsigned int j = 0; j < observations.size(); j++)
+	{
+		double xc = observations[j].x;
+		double yc = observations[j].y;
+
+		double xm = xp + cos(theta_p)*xc - sin(theta_p)*yc;
+		double ym = yp + sin(theta_p)*xc + cos(theta_p)*yc;
+
+		LandmarkObs obs;
+		obs.x = xm;
+		obs.y = ym;
+		obs.id = observations[j].id; //??
+		meas_landmarks[j] = obs;
+	}
+}
+
+static double _calc_weight(const std::vector<LandmarkObs> &pred_landmarks,
+		const std::vector<LandmarkObs> &meas_landmarks,
+		double std_x,
+		double std_y)
+{
+	/* Calcualte weight according to gaussian distribution.
+
+		# Args
+			pred_landmarks
+			meas_landmarks
+			std_x, std_y
+	 */
+	double weight = 1.0;
+	double na = 2.0 * std_x * std_x;
+	double nb = 2.0 * std_y * std_y;
+	double gauss_norm = 2.0 * M_PI * std_x * std_y;
+
+	for (unsigned j=0; j < meas_landmarks.size(); j++){
+		double o_x = meas_landmarks[j].x;
+		double o_y = meas_landmarks[j].y;
+
+		double pr_x, pr_y;
+		for (unsigned int k = 0; k < pred_landmarks.size(); k++) {
+    		if (pred_landmarks[k].id == meas_landmarks[j].id) {
+      			pr_x = pred_landmarks[k].x;
+      			pr_y = pred_landmarks[k].y;
+      			break;
+    		}
+  		}
+  		double obs_w = 1/gauss_norm * exp( - (pow(pr_x-o_x,2)/na + (pow(pr_y-o_y,2)/nb)) );
+  		weight *= obs_w;
+	}
+	return weight;
 }
