@@ -111,7 +111,7 @@ static void _get_pred_landmarks(std::vector<LandmarkObs> &pred_landmarks, const 
 		obs.x = map_landmarks.landmark_list[i].x_f;
 		obs.y = map_landmarks.landmark_list[i].y_f;
 		obs.id = map_landmarks.landmark_list[i].id_i;
-		pred_landmarks.push_back(obs);
+		pred_landmarks[i] = obs;
 	}
 }
 
@@ -133,6 +133,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 	// 1. Get predicted landmarks
 	std::vector<LandmarkObs> pred_landmarks;
+	pred_landmarks.resize(num_particles);
 	_get_pred_landmarks(pred_landmarks, map_landmarks);
 
 	for (int i = 0; i < num_particles; i++)
