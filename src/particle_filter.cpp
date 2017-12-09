@@ -150,6 +150,34 @@ static void _to_map_coord(std::vector<LandmarkObs> &meas_landmarks,
 	}
 }
 
+static double _calc_weight(const std::vector<LandmarkObs> &pred_landmarks,
+		const std::vector<LandmarkObs> &meas_landmarks,
+		double std_x,
+		double std_y)
+{
+	double weight = 1.0;
+	double na = 2.0 * std_x * std_x;
+	double nb = 2.0 * std_y * std_y;
+	double gauss_norm = 2.0 * M_PI * std_x * std_y;
+
+	for (unsigned j=0; j < meas_landmarks.size(); j++){
+		double o_x = meas_landmarks[j].x;
+		double o_y = meas_landmarks[j].y;
+
+		double pr_x, pr_y;
+		for (unsigned int k = 0; k < pred_landmarks.size(); k++) {
+    		if (pred_landmarks[k].id == meas_landmarks[j].id) {
+      			pr_x = pred_landmarks[k].x;
+      			pr_y = pred_landmarks[k].y;
+      			break;
+    		}
+  		}
+  		double obs_w = 1/gauss_norm * exp( - (pow(pr_x-o_x,2)/na + (pow(pr_y-o_y,2)/nb)) );
+  		weight *= obs_w;
+	}
+	return weight;
+}
+
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
 		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
 	/* Calculate likelihood and update weights (particles[i].weight, weight)
@@ -180,29 +208,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		dataAssociation(pred_landmarks, meas_landmarks);
 
 		// 3. update weights
-		particles[i].weight = 1.0;
-
-		double std_x = std_landmark[0];
-		double std_y = std_landmark[1];
-		double na = 2.0 * std_x * std_x;
-		double nb = 2.0 * std_y * std_y;
-		double gauss_norm = 2.0 * M_PI * std_x * std_y;
-
-		for (unsigned j=0; j < observations.size(); j++){
-			double o_x = meas_landmarks[j].x;
-			double o_y = meas_landmarks[j].y;
-
-			double pr_x, pr_y;
-			for (unsigned int k = 0; k < pred_landmarks.size(); k++) {
-        		if (pred_landmarks[k].id == meas_landmarks[j].id) {
-          			pr_x = pred_landmarks[k].x;
-          			pr_y = pred_landmarks[k].y;
-          			break;
-        		}
-      		}
-      		double obs_w = 1/gauss_norm * exp( - (pow(pr_x-o_x,2)/na + (pow(pr_y-o_y,2)/nb)) );
-      		particles[i].weight *= obs_w;
-		}
+		particles[i].weight = _calc_weight(pred_landmarks, meas_landmarks, std_landmark[0], std_landmark[1]);
 		weights[i] = particles[i].weight;
 	}
 }
