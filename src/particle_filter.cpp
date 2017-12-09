@@ -184,12 +184,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 void ParticleFilter::resample() {
 	/* Resampling the particles according to the weight. */
-
 	default_random_engine gen;
-	vector<Particle> resampled_particles;
-  	vector<double> weights;
-  	weights.resize(num_particles);
-  	resampled_particles.resize(num_particles);
+	vector<Particle> resampled_particles(num_particles);
+  	vector<double> weights(num_particles);
 
   	// 1. Get particles weights
   	for (int i = 0; i < num_particles; i++) {
