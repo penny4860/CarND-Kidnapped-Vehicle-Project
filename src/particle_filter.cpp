@@ -104,7 +104,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
 		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
-	/* Calculate likelihood and update weights
+	/* Calculate likelihood and update weights (particles[i].weight, weight)
 
 		# Args
 			sensor_range :
