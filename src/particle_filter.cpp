@@ -200,7 +200,7 @@ void ParticleFilter::resample() {
   	discrete_distribution<int> index(weights.begin(), weights.end());
   	for (unsigned j=0; j<num_particles;j++){
   		int i = index(gen);
-  		resampled_particles[i] = particles[i];
+  		resampled_particles[j] = particles[i];
   	}
   	particles = resampled_particles;
 }
